@@ -1,0 +1,26 @@
+#!/bin/bash
+if ! type 7za >/dev/null 2>&1 ; then
+        printf "p7zip required\n"
+        exit 1
+fi
+if [ -f ~/Documents/password.asc ] ; then
+	password=`gpg -dq ~/Documents/password.asc`
+elif [ -f ~/.password.asc ] ; then
+	password=`gpg -dq ~/.password.asc`
+else
+	printf "password not found\n"
+	printf "try re-install or use mkgpgpass\n"
+	exit 1
+fi
+if [ -z $2 ] ; then
+	printf 's7zip: make a 7-zip archive that is protected\n'
+	printf 'usage:  s7zip <command> [<switches>...] <archive_name> [<file_names>...]\n'
+	printf '        if you need more help, type "7za -h" or "man 7za"\n'
+	printf 'example:\n'
+	printf '        s7zip a archive - add files to archive\n'
+	printf '        s7zip u archive - update files.to archive\n'
+	printf "        s7zip l archive - list files from archive\n"
+	printf '        s7zip x archive - extract files from archive\n'
+else
+	7za -p$password -mx0 -mhe=on -xr!.* $1 $2 $3 $4 $5 $6 $7 $8 $9
+fi

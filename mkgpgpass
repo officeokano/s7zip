@@ -1,0 +1,60 @@
+#!/bin/bash
+passfile=~/.password.asc
+inputpass () {
+        read -s -p "type password:" password1
+        printf "\n"
+        read -s -p "password again:" password2
+        printf "\n"
+}
+genpass () {
+	read -p "passwrod length:" passlength
+	password1=`cat /dev/urandom | tr -dc 'A-Za-z0-9' | head -c $passlength`
+}
+mkpass () {
+	inputpass
+	while [ "$password1" != "$password2" ]
+	do
+        	printf "password was not much\n"
+        	inputpass
+	done
+}
+mkorgen () {
+	printf "generate passowrd? (Y/n)"
+	read keyin
+	case "$keyin" in
+		[nN] )
+			mkpass ;;
+		* )
+			genpass ;;
+	esac
+}
+encrypt () {
+	printf $password1 | gpg -e -a -o $passfile
+	printf "password was stored in $passfile\n"
+	printf "reveal? (y/N)"
+	read keyin
+	case "$keyin" in
+		[yY] )
+			gpg -dq ~/.password.asc
+			printf "\n" ;;
+	esac
+}
+if ! type gpg >/dev/null 2>&1 ; then
+        printf "gpg required\n"
+        exit 1
+fi
+if [ -f $passfile ] ; then
+	printf "password already exist\noverwrite? (y/N)"
+	read keyin
+	case "$keyin" in
+		[yY] )
+			rm -f $passfile
+			mkorgen
+			encrypt ;;
+		* )
+			exit 1 ;;
+	esac
+else
+	mkorgen
+	encrypt
+fi
