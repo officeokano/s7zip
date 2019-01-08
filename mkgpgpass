@@ -8,7 +8,7 @@ inputpass () {
 }
 genpass () {
 	read -p "passwrod length:" passlength
-	password1=`cat /dev/urandom | tr -dc 'A-Za-z0-9' | head -c $passlength`
+	password1=$(cat /dev/urandom | tr -dc 'A-Za-z0-9' | head -c $passlength)
 }
 mkpass () {
 	inputpass
@@ -35,7 +35,7 @@ encrypt () {
 	read keyin
 	case "$keyin" in
 		[yY] )
-			gpg -dq ~/.password.asc
+			gpg -dq $passfile
 			printf "\n" ;;
 	esac
 }
